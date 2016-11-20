@@ -12,6 +12,8 @@ namespace TraktApp.Data
             try
             {
                 IEnumerable<TraktMovie> result = await TraktREST.GetPopularMovies();
+                foreach (TraktMovie tm in result)
+                    tm.Images = await GetMovieImagesList(tm.Ids.Imdb);
                 return result;
             }
             catch (Exception e)
@@ -20,5 +22,20 @@ namespace TraktApp.Data
                 return null;
             }
         }
+
+        public static async Task<FanartMovieImages> GetMovieImagesList(string imdb_id)
+        {
+            try
+            {
+                FanartMovieImages result = await FanartREST.GetMovieImagesList(imdb_id);
+                return result;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                return null;
+            }
+        }
+
     }
 }

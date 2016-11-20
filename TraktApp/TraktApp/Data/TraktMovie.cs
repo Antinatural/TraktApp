@@ -15,6 +15,9 @@ namespace TraktApp.Data
         [JsonProperty(PropertyName = "ids")]
         public TraktMovieIds Ids { get; set; }
 
+        [JsonProperty(PropertyName = "images")]
+        public FanartMovieImages Images { get; set; }
+
         [JsonProperty(PropertyName = "overview")]
         public string Overview { get; set; }
 

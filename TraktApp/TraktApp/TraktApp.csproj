@@ -36,7 +36,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Converters\ImageConverter.cs" />
     <Compile Include="Data\DataManager.cs" />
+    <Compile Include="Data\FanartMovieImages.cs" />
+    <Compile Include="Data\FanartMoviePoster.cs" />
+    <Compile Include="Data\FanartREST.cs" />
+    <Compile Include="Data\IFanartREST.cs" />
     <Compile Include="Data\ITraktREST.cs" />
     <Compile Include="Data\TraktMovie.cs" />
     <Compile Include="Data\TraktMovieIDs.cs" />
