@@ -23,6 +23,26 @@ namespace TraktApp.Data
             }
         }
 
+        public static async Task<IEnumerable<TraktMovie>> GetFilteredMovies(string filter, int page = 0, int limit = 10)
+        {
+            try
+            {
+                List<TraktSearchResult> result = await TraktREST.GetFilteredMovies(filter, page, limit);
+                List<TraktMovie> movies = new List<TraktMovie>();
+                foreach (TraktSearchResult tsr in result)
+                {
+                    tsr.Movie.Images = await GetMovieImagesList(tsr.Movie.Ids.Imdb);
+                    movies.Add(tsr.Movie);
+                }
+                return movies;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                return null;
+            }
+        }
+
         public static async Task<FanartMovieImages> GetMovieImagesList(string imdb_id)
         {
             try

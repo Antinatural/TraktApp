@@ -26,5 +26,20 @@ namespace TraktApp.Data
                 return null;
             }
         }
+
+        public static async Task<List<TraktSearchResult>> GetFilteredMovies(string filter, int page, int limit)
+        {
+            try
+            {
+                var client = RestService.For<ITraktREST>(baseurl);
+                var response = await client.GetFilteredMovies(client_id, filter, page, limit);
+                return response;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                return null;
+            }
+        }
     }
 }

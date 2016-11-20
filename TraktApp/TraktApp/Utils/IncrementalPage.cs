@@ -7,22 +7,29 @@ namespace TraktApp.Utils
 {
     public abstract class IncrementalPage<T> : ContentPage where T : class
     {
+        public SearchBar SearchBar { get; private set; }
         public ListView ListView { get; set; }
         public LoadingView LoadingView { get; private set; }
 
         public ObservableCollection<T> AllItems { get; private set; }
         public int CurrentPage { get; private set; }
+        public int RowsBeforeTheEndToLoad { get; set; }
+        public string LastSearch { get; protected set; }
+        public int SearchCount { get; protected set; }
         public bool HasMoreData { get; protected set; }
         public bool IsLoading { get; protected set; }
 
         protected IncrementalPage()
         {
+            RowsBeforeTheEndToLoad = 10;
+            LastSearch = string.Empty;
+            SearchCount = 0;
             AllItems = new ObservableCollection<T>();
 
-            LoadingView = new LoadingView
-            {
-                IsVisible = false
-            };
+            SearchBar = new SearchBar { Placeholder = "Search for..." };
+            SearchBar.TextChanged += async (sender, args) => await LoadSearch(SearchBar.Text);
+
+            LoadingView = new LoadingView { IsVisible = false };
             LoadingView.SetBinding(LoadingView.IsShowingProperty,
                 new Binding("IsBusy", source: this));
 
@@ -35,20 +42,27 @@ namespace TraktApp.Utils
             };
             ListView.ItemAppearing += async (sender, e) => {
                 if (HasMoreData && !IsLoading)
-                    {
-                        var foundIndex = AllItems.IndexOf(e.Item as T);
-                        if (foundIndex == AllItems.Count - 10)
-                            await LoadNextPage();
-                    }
+                {
+                    var foundIndex = AllItems.IndexOf(e.Item as T);
+                    if (foundIndex == AllItems.Count - RowsBeforeTheEndToLoad)
+                        await LoadNextPage();
+                }
             };
 
             var layout = new RelativeLayout();
             layout.Children.Add(
-                ListView,
+                SearchBar,
                 Constraint.Constant(0),
                 Constraint.Constant(0),
                 Constraint.RelativeToParent(p => p.Width),
-                Constraint.RelativeToParent(p => p.Height)
+                Constraint.Constant(50)
+            );
+            layout.Children.Add(
+                ListView,
+                Constraint.Constant(0),
+                Constraint.Constant(50),
+                Constraint.RelativeToParent(p => p.Width),
+                Constraint.RelativeToParent(p => p.Height - 50)
             );
             layout.Children.Add(
                 LoadingView,
@@ -60,8 +74,20 @@ namespace TraktApp.Utils
             Content = layout;
         }
 
+        public async Task LoadSearch(string text)
+        {
+            SearchCount++;
+            LastSearch = text;
+            CurrentPage = 1;
+            HasMoreData = true;
+            AllItems.Clear();
+            IsLoading = true;
+            await DoLoad();
+        }
+
         public async Task LoadFirstPage()
         {
+            LastSearch = string.Empty;
             CurrentPage = 1;
             HasMoreData = true;
             AllItems.Clear();
@@ -77,9 +103,11 @@ namespace TraktApp.Utils
 
         private async Task DoLoad()
         {
+            int LastSearchCount = SearchCount;
             IsBusy = true;
             var data = await LoadPage();
-            foreach (T item in data)
+            if (LastSearchCount==SearchCount)
+                foreach (T item in data)
                     AllItems.Add(item);
             IsBusy = false;
             IsLoading = false;

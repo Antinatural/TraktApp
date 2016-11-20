@@ -3,7 +3,6 @@ Small app that interacts with the trakt.tv API
 
 Features:
 - Show most popular movies
-- Show images
 - Endless scroll
 
 Using:
