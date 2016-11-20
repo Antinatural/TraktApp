@@ -14,16 +14,15 @@ namespace TraktApp
         {
             InitializeComponent();
             ListView.ItemTemplate = (DataTemplate)Resources["MovieTemplate"];
-            LoadFirstPage().IgnoreResult();
+            LoadFirstPage();//.IgnoreResult();
         }
 
-        protected async override Task<IEnumerable<TraktMovie>> LoadPage()
+        protected override IObservable<IEnumerable<TraktMovie>> LoadPage()
         {
             if (string.IsNullOrEmpty(LastSearch))
-                return await DataManager.GetPopularMovies(CurrentPage);
+                return DataManager.GetPopularMovies(CurrentPage);
             else
-                return await DataManager.GetFilteredMovies(LastSearch, CurrentPage);
-
+                return DataManager.GetFilteredMovies(LastSearch, CurrentPage);
         }
     }
 }

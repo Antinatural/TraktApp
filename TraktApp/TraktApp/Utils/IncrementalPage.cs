@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace TraktApp.Utils
@@ -16,7 +16,6 @@ namespace TraktApp.Utils
         public int RowsBeforeTheEndToLoad { get; set; }
         public string LastSearch { get; protected set; }
         public int SearchCount { get; protected set; }
-        public bool HasMoreData { get; protected set; }
         public bool IsLoading { get; protected set; }
 
         protected IncrementalPage()
@@ -27,7 +26,7 @@ namespace TraktApp.Utils
             AllItems = new ObservableCollection<T>();
 
             SearchBar = new SearchBar { Placeholder = "Search for..." };
-            SearchBar.TextChanged += async (sender, args) => await LoadSearch(SearchBar.Text);
+            SearchBar.TextChanged += (sender, args) => LoadSearch(SearchBar.Text);
 
             LoadingView = new LoadingView { IsVisible = false };
             LoadingView.SetBinding(LoadingView.IsShowingProperty,
@@ -40,12 +39,12 @@ namespace TraktApp.Utils
                 HasUnevenRows = true,
                 ItemsSource = AllItems
             };
-            ListView.ItemAppearing += async (sender, e) => {
-                if (HasMoreData && !IsLoading)
+            ListView.ItemAppearing += (sender, e) => {
+                if (!IsLoading)
                 {
                     var foundIndex = AllItems.IndexOf(e.Item as T);
                     if (foundIndex == AllItems.Count - RowsBeforeTheEndToLoad)
-                        await LoadNextPage();
+                        LoadNextPage();
                 }
             };
 
@@ -74,45 +73,49 @@ namespace TraktApp.Utils
             Content = layout;
         }
 
-        public async Task LoadSearch(string text)
+        public void LoadSearch(string text)
         {
             SearchCount++;
             LastSearch = text;
             CurrentPage = 1;
-            HasMoreData = true;
             AllItems.Clear();
             IsLoading = true;
-            await DoLoad();
+            DoLoad();
         }
 
-        public async Task LoadFirstPage()
+        public void LoadFirstPage()
         {
             LastSearch = string.Empty;
             CurrentPage = 1;
-            HasMoreData = true;
             AllItems.Clear();
             IsLoading = true;
-            await DoLoad();
+            DoLoad();
         }
 
-        public async Task LoadNextPage()
+        public void LoadNextPage()
         {
             CurrentPage++;
-            await DoLoad();
+            DoLoad();
         }
 
-        private async Task DoLoad()
+        private void DoLoad()
         {
             int LastSearchCount = SearchCount;
             IsBusy = true;
-            var data = await LoadPage();
-            if (LastSearchCount==SearchCount)
-                foreach (T item in data)
-                    AllItems.Add(item);
-            IsBusy = false;
-            IsLoading = false;
+            
+            IEnumerable<T> result = default(IEnumerable<T>);
+            var data = LoadPage();
+            data.Subscribe(rx =>
+            {
+                result = rx;
+                if (result!=null && LastSearchCount == SearchCount)
+                    foreach (T item in result)
+                        AllItems.Add(item);
+                IsBusy = false;
+                IsLoading = false;
+            });
         }
 
-        protected abstract Task<IEnumerable<T>> LoadPage();
+        protected abstract IObservable<IEnumerable<T>> LoadPage();
     }
 }
