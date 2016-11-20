@@ -9,7 +9,7 @@ namespace TraktApp.Data
     [Headers("Accept: application/json", "trakt-api-version:2")]
     public interface ITraktREST
     {
-        [Get("/movies/popular/?extended=full")]
-        Task<List<TraktMovie>> GetPopularMovies([Header("trakt-api-key")] string client_id);
+        [Get("/movies/popular/?page={page}&limit={limit}&extended=full")]
+        Task<List<TraktMovie>> GetPopularMovies([Header("trakt-api-key")] string client_id, int page, int limit);
     }
 }

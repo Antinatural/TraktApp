@@ -12,12 +12,12 @@ namespace TraktApp.Data
         const string baseurl = "https://api.trakt.tv";
         const string client_id = "trakt_client_id_here";
 
-        public static async Task<List<TraktMovie>> GetPopularMovies()
+        public static async Task<List<TraktMovie>> GetPopularMovies(int page, int limit)
         {
             try
             {
                 var client = RestService.For<ITraktREST>(baseurl);
-                var response = await client.GetPopularMovies(client_id);
+                var response = await client.GetPopularMovies(client_id, page, limit);
                 return response;
             }
             catch (Exception e)

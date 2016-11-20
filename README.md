@@ -2,8 +2,9 @@
 Small app that interacts with the trakt.tv API
 
 Features:
-- Show 10 most popular movies
+- Show most popular movies
 - Show images
+- Endless scroll
 
 Using:
 - Xamarin Forms PCL XAML
