@@ -7,11 +7,11 @@ namespace TraktApp.Data
 {
     static class DataManager
     {
-        public static async Task<IEnumerable<TraktMovie>> GetPopularMovies()
+        public static async Task<IEnumerable<TraktMovie>> GetPopularMovies(int page = 0, int limit = 10)
         {
             try
             {
-                IEnumerable<TraktMovie> result = await TraktREST.GetPopularMovies();
+                IEnumerable<TraktMovie> result = await TraktREST.GetPopularMovies(page, limit);
                 foreach (TraktMovie tm in result)
                     tm.Images = await GetMovieImagesList(tm.Ids.Imdb);
                 return result;

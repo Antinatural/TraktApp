@@ -1,20 +1,25 @@
-﻿using TraktApp.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using TraktApp.Data;
+using TraktApp.Utils;
 using Xamarin.Forms;
 
 namespace TraktApp
 {
-    public partial class MoviesPage : ContentPage
+    public partial class MoviesPage : IncrementalPage<TraktMovie>
     {
+
         public MoviesPage()
         {
             InitializeComponent();
-            LoadData();
+            ListView.ItemTemplate = (DataTemplate)Resources["MovieTemplate"];
+            LoadFirstPage().IgnoreResult();
         }
 
-        private async void LoadData()
+        protected async override Task<IEnumerable<TraktMovie>> LoadPage()
         {
-            var data = await DataManager.GetPopularMovies();
-            BindingContext = data;
+            return await DataManager.GetPopularMovies(CurrentPage);
         }
     }
 }
