@@ -46,6 +46,7 @@
     <Compile Include="Data\TraktMovie.cs" />
     <Compile Include="Data\TraktMovieIDs.cs" />
     <Compile Include="Data\TraktREST.cs" />
+    <Compile Include="Data\TraktSearchResult.cs" />
     <Compile Include="MoviesPage.xaml.cs">
       <DependentUpon>MoviesPage.xaml</DependentUpon>
     </Compile>

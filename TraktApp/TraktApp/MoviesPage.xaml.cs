@@ -19,7 +19,11 @@ namespace TraktApp
 
         protected async override Task<IEnumerable<TraktMovie>> LoadPage()
         {
-            return await DataManager.GetPopularMovies(CurrentPage);
+            if (string.IsNullOrEmpty(LastSearch))
+                return await DataManager.GetPopularMovies(CurrentPage);
+            else
+                return await DataManager.GetFilteredMovies(LastSearch, CurrentPage);
+
         }
     }
 }

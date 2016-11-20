@@ -11,5 +11,8 @@ namespace TraktApp.Data
     {
         [Get("/movies/popular/?page={page}&limit={limit}&extended=full")]
         Task<List<TraktMovie>> GetPopularMovies([Header("trakt-api-key")] string client_id, int page, int limit);
+
+        [Get("/search/movie?query={filter}&page={page}&limit={limit}&extended=full")]
+        Task<List<TraktSearchResult>> GetFilteredMovies([Header("trakt-api-key")] string client_id, string filter, int page, int limit);
     }
 }
